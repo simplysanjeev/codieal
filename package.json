@@ -1,0 +1,16 @@
+{
+  "name": "codieal",
+  "version": "1.0.0",
+  "description": "Social Media App",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.17.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start" : "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sanjeev Kumar",
+  "license": "ISC"
+}
