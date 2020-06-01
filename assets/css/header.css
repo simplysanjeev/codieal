@@ -1,2 +1,23 @@
 header {
-  font-size: 30px; }
+  height: 30px;
+  background-color: cornflowerblue;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center; }
+  header h2 {
+    margin: 0px;
+    letter-spacing: 0.2rem;
+    padding: 0px 10px; }
+  header ul {
+    list-style: none;
+    margin: 0px;
+    padding: 0px; }
+    header ul li {
+      margin: 0px;
+      padding: 0px 10px;
+      display: inline-block; }
+      header ul li a {
+        text-decoration: none;
+        color: white;
+        font-size: 20px; }
