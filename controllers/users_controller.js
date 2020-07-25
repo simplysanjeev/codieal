@@ -15,6 +15,7 @@ module.exports.update = function(request, response){
             return response.redirect('back');
         });
     }else{
+        request.flash('error', 'Unauthorised!');
         return response.status(401).send('Unauthorised');
     }
 }
@@ -44,35 +45,36 @@ module.exports.signIn = function(request, response){
 }
 
 //get the sign up data
-module.exports.create = function(request, response){
+module.exports.create = async function(request, response){
     if(request.body.password !== request.body.confirm_password){
+        request.flash('error', 'Passwords do not match');
         return response.redirect('back');
     }
-    console.log("Searching for password");
-    User.findOne({email: request.body.email}, function(error, user){
-        if(error){
-            console.log('error in finding user in signing up');
-            return;
-        }
+
+    try{
+        let user = await User.findOne({email: request.body.email});
         if(!user){
-            User.create(request.body, function(error, user){
-                if(error){console.log('error in finding user in signing up');return;}
-                return  response.redirect('/users/sign-in');  
-            });
+            await User.create(request.body);
+            return  response.redirect('/users/sign-in');  
         }else{
-            console.log("User found");
+            request.flash('success', 'You have signed up, login to continue!');
             return response.redirect('back');
         }
-    });
+    }catch(error){
+        request.flash('error', error);
+    }
+
 }
 
 //sign in and create a session for the user
 module.exports.createSession = function(request, response){
     //TODO later
+    request.flash('success', 'Logged in Successfully');
     return response.redirect('/');
 }
 
 module.exports.destroySession = function(request, response){
     request.logout();
+    request.flash('success', 'You have Logged Out!!');
     return response.redirect('/');  
 }
