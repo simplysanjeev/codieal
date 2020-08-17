@@ -1,6 +1,9 @@
 const User = require('../models/user');
 const fs = require('fs');
 const path = require('path');
+const crypto = require('crypto');
+const resetPasswordMailer = require('../mailers/reset_password_mailer'); 
+const ResetPasswordTokenCollection = require('../models/resetPasswordToken');
 module.exports.profile = function(request, response){
     User.findById(request.params.id, function(error, user){
         return response.render('user_profile', {
@@ -99,4 +102,68 @@ module.exports.destroySession = function(request, response){
     request.logout();
     request.flash('success', 'You have Logged Out!!');
     return response.redirect('/');  
+}
+module.exports.resetPasswordFormRedirect = function(request, response){
+    response.render('reset_password_form',{title:'Reset Password'});
+}
+module.exports.resetPasswordMailGenerator = async function(request, response){
+    //TODO create reset password token document
+    try{
+        let email = request.body.email;
+        let user = await User.findOne({email:email});
+        
+        if(user){
+            let accesstoken = crypto.randomBytes(50).toString('hex');
+            let token = await ResetPasswordTokenCollection.create({
+                user: user._id,
+                accesstoken: accesstoken,
+                isValid: true
+            });
+            token = await ResetPasswordTokenCollection.findById(token._id).populate('user');
+            resetPasswordMailer.resetPassword(token);
+            return response.render('check_email', {title: "Reset Password | Codeial", email: token.user.email});
+        }else{
+            request.flash('error', 'Invalid Email Id');
+            return response.redirect('back');
+        }
+    }catch(error){
+        console.log('Error ', error);
+        return response.redirect('back');
+    }
+    //TODo Store it in reset Password token inside resetPasswordToken collection
+    //TODO send mail to reset password with token
+}
+
+module.exports.changePasswordFormRedirect = async function(request, response){
+    //TODO check if new password == confirm new password
+    //TODO check reset password token recieved through the request
+    //TODO token matches set isValid false
+    console.log(request.query.accesstoken);
+    let token = await ResetPasswordTokenCollection.findOne({accesstoken: request.query.accesstoken}).populate('user');
+    if(token && token.isValid == true){
+        return response.render('enter_new_password', {title: 'Change Password', accesstoken : token.accesstoken, email: token.user.email});
+    }else{
+        response.flash('error', 'Invalid Token');
+        return response.redirect('/');
+    }
+}
+
+module.exports.enterNewPasswordForm = async function(request, response){
+    // console.log(request.body.password, request.body["confirm-password"]);
+    if(request.body.password != request.body["confirm-password"]){
+        request.flash('error', 'Password didnot matched!!');
+        return response.redirect('back');
+    }else{
+        let token = await ResetPasswordTokenCollection.findOne({accesstoken: request.body.accesstoken}).populate('user');
+        // console.log(token);
+        if(token && token.isValid == true){
+            token = await ResetPasswordTokenCollection.findByIdAndUpdate(token._id, {isValid: false});
+            let user = await User.findByIdAndUpdate(token.user._id, {password: request.body.password});
+            request.flash('success', 'Password Changed. Redirecting to Sign In Page');
+            return response.render('user_sign_in', {title:"Codeial | Sign In"});
+        }else{
+            request.flash('error', 'Access Token is Invalid!!');
+            return response.render('user_sign_in', {title:"Codeial | Sign In"});
+        }
+    }
 }

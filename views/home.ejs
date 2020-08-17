@@ -13,8 +13,8 @@
         <div id="posts-list-container">
             <ul>
                 <% for(post of posts){ %>
-                    <%- include('_post') -%>
-                <%}%>
+        <%- include('_post') -%>
+        <%}%>
             </ul>
         </div>
     </section>
@@ -22,10 +22,17 @@
     <section id="user-friends">
         <h4>Friends</h4>
         <% for(user of all_users){ %>
-            <p>
-                <a href="/users/profile/<%= user.id %>"><%= user.name %></a>
-            </p>
+        <p>
+            <a href="/users/profile/<%= user.id %>"><%= user.name %></a>
+        </p>
         <%}%>
     </section>
 </div>
 <script src="/js/home_posts.js"></script>
+<script src="/js/toggle_likes.js"></script>
+<script>
+    $('.toggle-like-button').each(function () {
+        let self = this;
+        let toggleLike = new ToggleLike(self);
+    });
+</script>

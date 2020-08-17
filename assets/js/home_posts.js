@@ -87,7 +87,7 @@
                         ${ comment.content }
                         <br>
                         <small>
-                            ${ comment.user_name }
+                            ${ comment.user.name }
                         </small>
                     </p>
                  </li>`);
