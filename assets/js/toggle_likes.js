@@ -7,10 +7,11 @@ class ToggleLike {
     $(this.toggler).click(function (event) {
       event.preventDefault();
       let self = this;
+      console.log($(self).attr('href'));
       $.ajax({
-        type: 'POST',
-        url: $(self).attr('href'),
-      })
+          type: 'POST',
+          url: $(self).attr('href'),
+        })
         .done(function (data) {
           let likesCount = parseInt($(self).attr('data-likes'));
           console.log(likesCount);

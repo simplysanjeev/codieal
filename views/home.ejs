@@ -19,20 +19,42 @@
         </div>
     </section>
     
-    <section id="user-friends">
-        <h4>Friends</h4>
-        <% for(user of all_users){ %>
+    <section id="users">
+        <div id="user-friends">
+            <h4>Friends</h4>
+            <% for(user of all_users){ %>
         <p>
             <a href="/users/profile/<%= user.id %>"><%= user.name %></a>
+            <a class="toggle-friendship-button" href="/friendship/toggle/?user-id=<%=user.id%>">
+                <% if(!friend_list.has(user.id)) {%>
+                add friend
+                <%}else{%>
+                remove friend
+                <%}%>
+            </a>
         </p>
         <%}%>
+</div>
+<div id="other-users">
+    <h4>Other Users</h4>
+    <% for(user of all_users){ %>
+    <p>
+        <a href="/users/profile/<%= user.id %>"><%= user.name %></a>
+    </p>
+    <%}%>
+        </div>
     </section>
 </div>
 <script src="/js/home_posts.js"></script>
 <script src="/js/toggle_likes.js"></script>
+<script src="/js/toggle_friendship.js"></script>
 <script>
     $('.toggle-like-button').each(function () {
         let self = this;
         let toggleLike = new ToggleLike(self);
+    });
+    $('.toggle-friendship-button').each(function(){
+        let self = this;
+        let toggleFriendship = new ToggleFriendship(self);
     });
 </script>

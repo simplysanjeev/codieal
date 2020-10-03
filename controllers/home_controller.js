@@ -18,17 +18,21 @@ module.exports.home = async function (request, response) {
           sort: "-createdAt",
         },
       })
-      // .populate("comments")
       .populate("likes");
+    let friendList = new Set();
+    for (friend of request.user.friendships) {
+      friendList.add(friend);
+    }
     let users = await User.find({});
-
+    console.log(friendList);
     return response.render("home", {
       title: "Codeial | Home",
       posts: posts,
       all_users: users,
+      friend_list: friendList
     });
   } catch (error) {
     console.log(`Error: ${error}`);
     return;
   }
-};
+}
